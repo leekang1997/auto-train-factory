@@ -4,6 +4,14 @@
 
 `Auto-Train-Factory` is an automation toolkit built around the LLaMA-Factory workflow. Its goal is to connect dataset registration, config generation, training orchestration, evaluation, and LoRA export into a single Python-based pipeline.
 
+## At A Glance
+
+- Project type: an automation layer on top of `LLaMA-Factory`
+- Core goal: reduce repetitive and hard-to-reproduce engineering work in fine-tuning workflows
+- Best for: researchers, labs, and small teams working on SFT / LoRA tuning
+- Dependency: requires a working `LLaMA-Factory` installation first
+- Current stage: initial open-source release focused on workflow abstraction and engineering organization
+
 ## Project Positioning
 
 Many fine-tuning workflows run into the same issues:
