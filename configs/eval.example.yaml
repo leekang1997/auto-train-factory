@@ -1,0 +1,6 @@
+output_dir: ./outputs/eval
+gpu_devices:
+  - "0"
+host: 127.0.0.1
+timeout_seconds: 300
+vllm_python_executable: python3

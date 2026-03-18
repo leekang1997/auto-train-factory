@@ -1,0 +1,8 @@
+model_path: /path/to/base-model
+adapter_path: /path/to/lora-adapter
+export_dir: ./outputs/exported-model
+export_yaml_path: ./outputs/export.yaml
+template_name: qwen
+export_size: 2
+export_device: cpu
+export_legacy_format: false
