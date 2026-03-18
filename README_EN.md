@@ -24,6 +24,57 @@ This project turns those repeated steps into reusable code.
 - supports evaluation output generation through an OpenAI-compatible endpoint
 - generates export YAML files for LoRA merge workflows
 
+## Why This Project Exists
+
+In many LLM fine-tuning workflows, the most time-consuming part is not training itself, but the surrounding repetitive engineering work.
+
+- every new dataset requires manual registration changes
+- every new experiment starts from copying and editing another YAML file
+- evaluation and export are often handled by separate ad hoc scripts
+- output folders, logs, and run names become messy across repeated experiments
+
+This project exists to turn those scattered steps into one reusable Python workflow so that fine-tuning becomes easier to reproduce, easier to hand over, and easier to maintain in a team setting.
+
+## How To Use It
+
+A typical usage flow looks like this:
+
+1. Prepare your training data, for example in `jsonl` format.
+2. Define a `TrainJobConfig` with model path, dataset name, output directory, and training hyperparameters.
+3. Call `register_dataset` to update `dataset_info.json`.
+4. Call `build_train_yaml` to generate the LLaMA-Factory training config.
+5. After training, use the evaluation module to export inference results.
+6. Use the export module to build the LoRA merge config for delivery or deployment.
+
+It is especially useful for:
+
+- personal research with frequent experiment iteration
+- labs where multiple people share one training workflow
+- small teams that want a cleaner fine-tuning pipeline
+- projects that need a trackable train-eval-export lifecycle
+
+## How The Project Works
+
+The current repository organizes the workflow into four understandable modules:
+
+- `dataset.py`
+  - registers datasets into the metadata file expected by LLaMA-Factory
+- `trainer.py`
+  - turns training parameters into standard YAML configs
+- `evaluator.py`
+  - sends test prompts to an OpenAI-compatible endpoint and saves normalized outputs
+- `exporter.py`
+  - builds the config needed for LoRA merge and export
+
+In other words, the goal is not to replace the training framework itself, but to add a reusable automation layer around it.
+
+## How It Helps Others
+
+- helps researchers spend less time on repetitive configuration work
+- helps teams keep training runs, outputs, and experiment versions organized
+- helps new contributors understand the workflow faster
+- helps projects connect training, evaluation, and export into one stable pipeline
+
 ## What Is Already Included In This Repo
 
 - `auto_train_factory/dataset.py`
