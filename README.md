@@ -25,6 +25,19 @@
 - 自动拉起 vLLM 进行评测
 - 自动执行 LoRA 权重合并导出
 
+## 使用前提
+
+这个仓库不是独立替代 `LLaMA-Factory` 的训练框架，而是构建在 `LLaMA-Factory` 之上的自动化工具层。
+
+这意味着你在使用它之前，必须先完成下面几件事：
+
+1. 先单独安装好 `LLaMA-Factory`
+2. 确保本地已经能正常执行 `llamafactory-cli train`
+3. 确定你的 `LLaMA-Factory` 安装目录
+4. 在本项目配置中，把相关路径指向你本地的 `LLaMA-Factory` 目录和数据目录
+
+如果没有先装好 `LLaMA-Factory`，这个仓库只能帮你生成配置和组织流程，不能真正完成训练。
+
 ## 这个项目是为了解决什么
 
 如果你经常做大模型微调，很容易遇到一个问题：真正耗时间的往往不是“训练本身”，而是训练前后那些重复又容易出错的工程动作。
@@ -40,12 +53,15 @@
 
 一个典型使用流程是这样的：
 
-1. 准备好训练数据文件，例如 `jsonl` 格式的 SFT 数据。
-2. 用 `TrainJobConfig` 描述模型路径、数据集名称、输出目录和训练超参数。
-3. 调用 `register_dataset` 把数据集写入 `dataset_info.json`。
-4. 调用 `build_train_yaml` 生成 LLaMA-Factory 训练配置。
-5. 训练完成后，再用评测模块生成推理评测结果。
-6. 最后用导出模块生成 LoRA 合并配置，进入模型交付流程。
+1. 先安装并验证 `LLaMA-Factory`。
+2. 准备好训练数据文件，例如 `jsonl` 格式的 SFT 数据。
+3. 找到你本地 `LLaMA-Factory` 里的 `data/dataset_info.json` 路径。
+4. 用 `TrainJobConfig` 描述模型路径、数据集名称、输出目录、训练超参数，以及 `dataset_info_path`。
+5. 调用 `register_dataset` 把数据集写入 `LLaMA-Factory` 使用的 `dataset_info.json`。
+6. 调用 `build_train_yaml` 生成训练 YAML。
+7. 把生成出来的 YAML 交给 `llamafactory-cli train` 去真正执行训练。
+8. 训练完成后，再用评测模块生成推理评测结果。
+9. 最后用导出模块生成 LoRA 合并配置，进入模型交付流程。
 
 它适合下面这些场景：
 
@@ -68,6 +84,30 @@
   - 负责生成 LoRA 合并导出所需的配置，方便进入部署或共享环节
 
 也就是说，它不是重新发明训练框架，而是在现有训练框架外面补了一层更适合实验组织和工程复用的自动化壳。
+
+## 你需要配置哪些路径
+
+当前这套代码至少要和下面几类路径对齐：
+
+- `LLaMA-Factory` 安装目录
+  - 用来确定训练命令运行位置，以及 `dataset_info.json` 的实际位置
+- `dataset_info_path`
+  - 通常应当指向 `LLaMA-Factory/data/dataset_info.json`
+- `model_path`
+  - 你要微调的基座模型路径
+- `dataset_file`
+  - 你的训练数据文件路径
+- `output_dir`
+  - 训练输出目录
+- `yaml_output_path`
+  - 自动生成的训练 YAML 保存位置
+
+最关键的一点是：
+
+- 这个项目负责“生成配置、组织流程、连接训练前后步骤”
+- `LLaMA-Factory` 负责“真正执行训练”
+
+所以如果路径没有正确指向你本地的 `LLaMA-Factory` 安装位置，流程就会断掉。
 
 ## 它能给大家带来什么帮助
 
@@ -145,7 +185,24 @@ auto-train-factory/
 ## 快速开始
 
 ```bash
+git clone https://github.com/hiyouga/LLaMA-Factory.git
+cd LLaMA-Factory
+# 按 LLaMA-Factory 官方文档完成安装
+
+cd /path/to/auto-train-factory
 pip install -r requirements.txt
 python examples/register_and_build_train_yaml.py
 python examples/build_export_yaml.py
 ```
+
+## 一个更准确的上手思路
+
+你可以把这个项目理解成：
+
+- 先安装 `LLaMA-Factory`
+- 再用本仓库帮你减少围绕 `LLaMA-Factory` 的重复工程劳动
+
+也就是说，它更像：
+
+- `LLaMA-Factory` 的自动化增强层
+- 而不是一个完全独立的新训练框架
